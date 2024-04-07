@@ -76,9 +76,11 @@ def send(con, cur):
     cur.execute("INSERT INTO PMS (ID, OFFICE_NAME, POST_NUMBER, SEND_DATE, RECEIVE_DATE, PROVINCE, CITY, DISTRICT, ADDRESS, REG_NUMBER1, REG_NUMBER2) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data)
     con.commit()
 
-    print("Table updated!\n")
+    print("\nTable updated!")
+    ret = int(input("Continue? (1/0): "))
+    print("")
 
-    return int(input("Continue? (y/n): "))
+    return ret
         
 municipalities = ("北京市", "天津市", "上海市", "重庆市")
 
@@ -98,8 +100,8 @@ if __name__ == "__main__":
 
     initiate(con, cur)
     
+    key = main_menu()
     while True:
-        key = main_menu()
         match key:
             case 0:
                 break
