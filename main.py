@@ -1,5 +1,5 @@
 import sqlite3
-import datetime
+from datetime import datetime
 
 def initiate(con, cur):
     isInitiated = cur.execute("SELECT name FROM sqlite_master WHERE name='PMS'")
@@ -23,7 +23,7 @@ def main_menu():
     print("Welcome to Postmark Management System!\n===================================")
     print("Option: 1. Send  2. Receive  3. Show All  0. Exit")
     ret = input("Enter: ")
-    print("\n")
+    print("")
     return int(ret)
 
 def check_post_number():
@@ -31,10 +31,6 @@ def check_post_number():
     while post_number < 100000 or post_number > 999999:
         post_number = input("Enter post number: ")
     return post_number
-
-def enter_date(date):
-    time = datetime.datetime.strptime(date, '%Y-%m-%d')
-    return (datetime.date(time.year, time.month, time.day), )
 
 def send(con, cur):
     print("SENDING LETTER\n==============")
@@ -48,6 +44,10 @@ def send(con, cur):
     send_date = input("Enter send date(YYYY-mm-dd): ")
     
     receive_date = input("Enter receive date(YYYY-mm-dd): ")
+    if receive_date == "now":
+        receive_date = datetime.now().strftime("%Y-%m-%d")
+    elif receive_date == "withdrawn":
+        receive_date = "9999-12-31"
     
     province = input("Enter province: ")
 
@@ -88,7 +88,34 @@ def isMunicipality(province):
     return province in municipalities
 
 def receive(con, cur):
-    pass
+    id = input("Enter letter id: ")
+    res = cur.execute("SELECT OFFICE_NAME FROM PMS WHERE ID=?", (id,))
+
+    if res.fetchone() is None:
+        print(f"Letter No.{id} not found.")
+        ret = int(input("Continue? (1/0): "))
+        print("")
+        if ret == 1:
+            ret = 2
+        return ret
+    else:
+        receive_date = input("Enter receive date (YYYY-mm-dd)\n(enter \"now\" to insert today's date): ")
+        if receive_date == "now":
+            receive_date = datetime.now().strftime('%Y-%m-%d')
+        elif receive_date == "withdrawn":
+            receive_date = "9999-12-31"
+
+        cur.execute("UPDATE PMS SET RECEIVE_DATE = ? WHERE ID=?", (receive_date, id))
+
+        con.commit()
+    
+    print("Receive date updated.")
+    ret = int(input("Continue? (1/0): "))
+    if ret == 1:
+        ret = 2
+    print("")
+
+    return ret
 
 def show_all(con, cur):
     for row in cur.execute("SELECT * FROM PMS ORDER BY ID ASC"):
