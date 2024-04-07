@@ -7,7 +7,7 @@ def initiate(con, cur):
         con.execute("""CREATE TABLE PMS(
             ID TEXT PRIMARY KEY NOT NULL,
             OFFICE_NAME TEXT NOT NULL,
-            POST_NUMBER INT CHECK(POST_NUMBER >= 100000 AND POST_NUMBER < 1000000),
+            POST_NUMBER TEXT NOT NULL,
             SEND_DATE DATE NOT NULL,
             RECEIVE_DATE DATE DEFAULT NULL,
             PROVINCE TEXT NOT NULL,
@@ -24,7 +24,7 @@ def main_menu():
     print("Option: 1. Send  2. Receive  3. Show All  0. Exit")
     ret = input("Enter: ")
     print("\n")
-    return ret
+    return int(ret)
 
 def check_post_number():
     post_number = int(input("Enter post number: "))
@@ -43,7 +43,7 @@ def send(con, cur):
     
     office_name = input("Enter office name: ")
     
-    post_number = check_post_number()
+    post_number = input("Enter post number: ")
     
     send_date = input("Enter send date(YYYY-mm-dd): ")
     
@@ -78,7 +78,7 @@ def send(con, cur):
 
     print("Table updated!\n")
 
-    return 0
+    return int(input("Continue? (y/n): "))
         
 municipalities = ("北京市", "天津市", "上海市", "重庆市")
 
@@ -98,19 +98,18 @@ if __name__ == "__main__":
 
     initiate(con, cur)
     
-    key = main_menu()
     while True:
+        key = main_menu()
         match key:
-            case '0':
+            case 0:
                 break
-            case '1':
+            case 1:
                 key = send(con, cur)
-            case '2':
+            case 2:
                 key = receive(con, cur)
-            case '3':
+            case 3:
                 key = show_all(con, cur)
             case _:
-                key = main_menu()
                 continue
 
     cur.close()
