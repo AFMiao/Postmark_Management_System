@@ -1,10 +1,10 @@
 import sqlite3
 import datetime
 
-def initiate(con, cur):
-    isInitiated = cur.execute("SELECT name FROM sqlite_master WHERE name='PMS'")
+def initiate(con):
+    isInitiated = con.execute("SELECT name FROM sqlite_master WHERE name='PMS'")
     if isInitiated.fetchone() is None:
-        cur.execute("""CREATE TABLE PMS(
+        con.execute("""CREATE TABLE PMS(
             ID TEXT PRIMARY KEY NOT NULL,
             OFFICE_NAME TEXT NOT NULL,
             POST_NUMBER INT CHECK(POST_NUMBER >= 100000 AND POST_NUMBER < 1000000),
@@ -30,11 +30,44 @@ def check_post_number():
         post_number = input("Enter post number: ")
     return post_number
 
-def send(con, cur):
+def enter_date(date):
+    time = datetime.datetime.strptime(date, '%Y-%m-%d')
+    return (datetime.date(time.year, time.month, time.day), )
+
+def send(con):
     print("SENDING LETTER\n==============")
+
     id = input("Enter id: ")
+    
     office_name = input("Enter office name: ")
+    
     post_number = check_post_number()
+    
+    send_date = enter_date(input("Enter send date(YYYY-mm-dd): "))
+    
+    receive_date = enter_date(input("Enter receive date(YYYY-mm-dd): "))
+    
+    province = input("Enter province: ")
+    city = input("Enter city: ")
+    district = input("Enter district")
+    address = input("Enter address: ")
+    
+    reg_flag1 = input("Is the letter a registered one? (y/n): ")
+    reg_number1 = ""
+    if reg_flag1 == 'y':
+        reg_number1 = input("Enter registered number: ")
+    
+    reg_flag2 = input("Is the receive a registered one? (y/n): ")
+    reg_number2 = ""
+    if reg_flag2 == 'y':
+        reg_number2 = input("Enter registered number: ")
+    
+    data = [
+        (id, office_name, post_number, send_date, receive_date, province, city, district, address, reg_number1, reg_number2),
+    ]
+
+    con.execute("INSERT INTO PMS VALUES(?)", data)
+        
 
 def receive(con, cur):
     pass
@@ -44,19 +77,18 @@ def show_all(con, cur):
 
 if __name__ == "__main__":
     con = sqlite3.connect("Postmark.db")
-    cur = con.cursor()
 
-    initiate(con, cur)
+    initiate(con)
     
     key = main_menu()
     while True:
         match key:
             case 1:
-                send()
+                send(con)
             case 2:
-                receive()
+                receive(con)
             case 3:
-                show_all()
+                show_all(con)
             case _:
                 key = main_menu()
                 continue
