@@ -91,7 +91,14 @@ def receive(con, cur):
     pass
 
 def show_all(con, cur):
-    pass
+    for row in cur.execute("SELECT * FROM PMS ORDER BY ID ASC"):
+        print(row)
+    
+    print("That's all!")
+    ret = int(input("What to do next? (1. Send / 2. Receive / 0. Quit): "))
+    print("")
+
+    return ret
 
 
 if __name__ == "__main__":
