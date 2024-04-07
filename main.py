@@ -19,6 +19,28 @@ def initiate(con, cur):
         """)
         con.commit()
 
+def main_menu():
+    print("Welcome to Postmark Management System!\n===================================")
+    print("Option: 1. Send\t2. Receive\t3. Show All")
+    return input("Enter:")
+
+def check_post_number():
+    post_number = input("Enter post number: ")
+    while post_number < 100000 or post_number > 999999:
+        post_number = input("Enter post number: ")
+    return post_number
+
+def send(con, cur):
+    print("SENDING LETTER\n==============")
+    id = input("Enter id: ")
+    office_name = input("Enter office name: ")
+    post_number = check_post_number()
+
+def receive(con, cur):
+    pass
+
+def show_all(con, cur):
+    pass
 
 if __name__ == "__main__":
     con = sqlite3.connect("Postmark.db")
@@ -26,3 +48,15 @@ if __name__ == "__main__":
 
     initiate(con, cur)
     
+    key = main_menu()
+    while True:
+        match key:
+            case 1:
+                send()
+            case 2:
+                receive()
+            case 3:
+                show_all()
+            case _:
+                key = main_menu()
+                continue
