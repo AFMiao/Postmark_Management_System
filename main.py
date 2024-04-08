@@ -15,7 +15,8 @@ def initiate(con, cur):
             DISTRICT TEXT NOT NULL,
             ADDRESS TEXT NOT NULL,
             REG_NUMBER1 TEXT DEFAULT NULL,
-            REG_NUMBER2 TEXT DEFAULT NULL)
+            REG_NUMBER2 TEXT DEFAULT NULL,
+            POSTMARK TEXT DEFAULT NULL)
         """)
         con.commit()
 
@@ -31,6 +32,11 @@ def check_post_number():
     while post_number < 100000 or post_number > 999999:
         post_number = input("Enter post number: ")
     return post_number
+
+def add_postmark(str, num = 1):
+    if str == "quit":
+        return ""
+    return str + ";" + add_postmark(input(f"Enter postmark {num + 1}: "), num + 1)
 
 def send(con, cur):
     print("SENDING LETTER\n==============")
@@ -71,9 +77,11 @@ def send(con, cur):
     if reg_flag2 == 'y':
         reg_number2 = input("Enter registered number: ")
     
-    data = [id, office_name, post_number, send_date, receive_date, province, city, district, address, reg_number1, reg_number2]
+    postmarks = add_postmark(input("Enter postmark 1: "))
+    
+    data = [id, office_name, post_number, send_date, receive_date, province, city, district, address, reg_number1, reg_number2, postmarks]
 
-    cur.execute("INSERT INTO PMS (ID, OFFICE_NAME, POST_NUMBER, SEND_DATE, RECEIVE_DATE, PROVINCE, CITY, DISTRICT, ADDRESS, REG_NUMBER1, REG_NUMBER2) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data)
+    cur.execute("INSERT INTO PMS (ID, OFFICE_NAME, POST_NUMBER, SEND_DATE, RECEIVE_DATE, PROVINCE, CITY, DISTRICT, ADDRESS, REG_NUMBER1, REG_NUMBER2, POSTMARK) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data)
     con.commit()
 
     print("\nTable updated!")
